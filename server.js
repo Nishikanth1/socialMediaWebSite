@@ -1,8 +1,8 @@
 const fastify = require("fastify");
 const { buildapp } = require("./app");
 
-const userRoutes = require("./routes/users");
-const homeRoutes = require("./routes/routes");
+const userRoutes = require("./modules/users/routes/external/users");
+const homeRoutes = require("./modules/home/routes/external/routes");
 
 const startApp = async () => {
   const PORT = process.env.PORT || 30000;
