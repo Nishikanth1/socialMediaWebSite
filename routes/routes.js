@@ -1,5 +1,5 @@
 async function routes(fastify, options) {
-  fastify.get('/', async (req, reply) => ({ hello: 'world' }));
+  fastify.get('/', async (request, reply) => ({ hello: 'world' }));
 }
 
 module.exports = {
