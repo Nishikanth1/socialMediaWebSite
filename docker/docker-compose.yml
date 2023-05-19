@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  pg-db-container:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=testDB
+      - PGUSER=postgres
+    ports:
+      - 9000:5432
+    volumes: 
+      # - db:/var/lib/postgresql/data
+      - ./init-scripts/create-test-dbs.sh:/docker-entrypoint-initdb.d/init.sh
+      - /docker-entrypoint-initdb.d/init.sh:/init-scripts/create-test-dbs.sh
+
+volumes:
+  db:
+    driver: local
