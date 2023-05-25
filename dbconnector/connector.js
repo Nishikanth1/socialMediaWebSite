@@ -18,4 +18,4 @@ const testDbConnection = async (logger) => {
   }
 };
 
-module.exports = { testDbConnection };
+module.exports = { testDbConnection, sequelize };
