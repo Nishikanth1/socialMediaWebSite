@@ -5,10 +5,15 @@ const env = process.env.NODE_ENV;
 const genderEnums = ["M", "F", "O"];
 
 const User = sequelize.define("user", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    primaryKey: true,
+    unique: true,
   },
 
   username: {
@@ -35,11 +40,16 @@ const User = sequelize.define("user", {
 
 const forceCleanDb = process.env.CLEAR_DB;
 console.log(`env is ${env}`);
+
+async function syncModels() {
+  await User.sync({ force: forceCleanDb });
+  console.log("User Model synced");
+}
+
 if (env !== "DEVELOPMENT") {
   (async () => {
-    await User.sync({ force: forceCleanDb });
-    console.log("User Model synced");
+    await syncModels();
   })();
 }
 
-module.exports = { User };
+module.exports = { User, syncModels };
