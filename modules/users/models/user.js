@@ -1,6 +1,9 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../../../dbconnector/connector");
 
+const env = process.env.NODE_ENV;
+const genderEnums = ["M", "F", "O"];
+
 const User = sequelize.define("user", {
   email: {
     type: DataTypes.STRING,
@@ -18,7 +21,8 @@ const User = sequelize.define("user", {
   },
 
   gender: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM(...genderEnums),
+
   },
 
   fullName: {
@@ -30,8 +34,12 @@ const User = sequelize.define("user", {
 });
 
 const forceCleanDb = process.env.CLEAR_DB;
-User.sync({ force: forceCleanDb }).then(() => {
-  console.log("User Model synced");
-});
+console.log(`env is ${env}`);
+if (env !== "DEVELOPMENT") {
+  (async () => {
+    await User.sync({ force: forceCleanDb });
+    console.log("User Model synced");
+  })();
+}
 
-module.exports = User;
+module.exports = { User };
