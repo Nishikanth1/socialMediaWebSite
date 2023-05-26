@@ -4,12 +4,13 @@ const chaiHttp = require("chai-http");
 const { buildapp } = require("../../../app");
 
 const should = chai.should();
-const { User } = require("../models/user");
+const { User, syncModels } = require("../models/user");
 
 chai.use(chaiHttp);
 let app;
 before(async () => {
   app = await buildapp();
+  await syncModels();
 });
 
 after(async () => {
@@ -20,11 +21,15 @@ async function createUser(userData) {
     ...userData,
   });
 }
-async function destroyData() {
+async function destroyUser() {
   await User.destroy({
     where: {},
     truncate: true,
   });
+}
+
+async function destroyData() {
+  await destroyUser();
 }
 
 describe("test user apis", () => {
@@ -42,6 +47,10 @@ describe("test user apis", () => {
       });
     });
 
+    afterEach("clear user data", async () => {
+      await destroyUser();
+    });
+
     it("test get all users ", async () => {
       const response = await app.inject(
         {
@@ -57,6 +66,32 @@ describe("test user apis", () => {
       data.rows[0].should.have.property("username", "test0user");
       data.rows[0].should.have.property("age", 22);
       data.rows[0].should.have.property("gender", "F");
+    });
+
+    it("test get single user by id ", async () => {
+      const allUserResp = await app.inject(
+        {
+          method: "GET",
+          url: "/users",
+        },
+      );
+      const allUserData = JSON.parse(allUserResp.body);
+      console.log(`allUserData in get single user data is ${JSON.stringify(allUserData)}`);
+      const userId = allUserData.rows[0].id;
+      const response = await app.inject(
+        {
+          method: "GET",
+          url: `/user/${userId}`,
+        },
+      );
+      const data = JSON.parse(response.body);
+      console.log(`single user data is ${JSON.stringify(data)}`);
+
+      data.should.have.property("id", userId);
+      data.should.have.property("email", "test0@gmail.com");
+      data.should.have.property("username", "test0user");
+      data.should.have.property("age", 22);
+      data.should.have.property("gender", "F");
     });
   });
 

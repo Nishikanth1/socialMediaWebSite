@@ -1,5 +1,20 @@
 const { User } = require("../models/user");
 
+async function getUser(request, response, logger) {
+  try {
+    const userId = request.params.id;
+    const data = await User.findByPk(userId);
+    logger.info(`data from get is ${JSON.stringify(data)}`);
+    response.status(200).send(data);
+  } catch (error) {
+    logger.error(error);
+    response.status(504).send({
+      message:
+      error.message || "Some error occurred while reading the user object.",
+    });
+  }
+}
+
 async function addUser(request, response, logger) {
   if (!request.body.email || !request.body.username) {
     response.status(400).send({
@@ -40,8 +55,12 @@ async function getAllUsers(request, response, logger) {
     logger.error(error);
     response.status(504).send({
       message:
-      error.message || "Some error occurred while reading the user object.",
+      error.message || "Some error occurred while reading the users object.",
     });
   }
 }
-module.exports = { addUser, getAllUsers };
+module.exports = {
+  addUser,
+  getAllUsers,
+  getUser,
+};
