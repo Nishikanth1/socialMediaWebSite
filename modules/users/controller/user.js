@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+const _ = require("lodash");
 const { User } = require("../models/user");
 
 async function getUser(request, response, logger) {
@@ -59,8 +61,63 @@ async function getAllUsers(request, response, logger) {
     });
   }
 }
+
+async function updateUser(request, response, logger) {
+  try {
+    const userId = request.params.id;
+    const userObject = {
+      email: request.body.email,
+      username: request.body.username,
+      age: request.body.age,
+      gender: request.body.gender,
+      fullName: request.body.fullName,
+      aboutMe: request.body.aboutMe,
+    };
+    logger.info(`udpate user body is ${JSON.stringify(userObject)}`);
+    const data = await User.update(userObject, { where: { id: userId } });
+    logger.info(`Update user ${userId} response is ${JSON.stringify(data)}`);
+    response.status(200).send({ isUpdated: true });
+  } catch (error) {
+    logger.error(error);
+    response.status(500).send({
+      message:
+      error.message || "Some error occurred while updating the user object.",
+    });
+  }
+}
+
+async function patchUser(request, response, logger) {
+  try {
+    const userId = request.params.id;
+    const userObject = {
+      email: request.body.email,
+      username: request.body.username,
+      age: request.body.age,
+      gender: request.body.gender,
+      fullName: request.body.fullName,
+      aboutMe: request.body.aboutMe,
+    };
+    logger.info(`patch user body is ${JSON.stringify(userObject)}`);
+    const existingUser = await User.findByPk(userId);
+    const updatedUserData = _.merge({}, existingUser, userObject);
+    const [updatedRowCount, updatedUsers] = await User.update(updatedUserData, {
+      where: { id: userId },
+      returning: true,
+    });
+    logger.info(`Patched user ${userId} response is ${JSON.stringify(updatedUsers)}`);
+    response.status(200).send({ isUpdated: true });
+  } catch (error) {
+    logger.error(error);
+    response.status(500).send({
+      message:
+      error.message || "Some error occurred while updating the user object.",
+    });
+  }
+}
 module.exports = {
   addUser,
   getAllUsers,
   getUser,
+  updateUser,
+  patchUser,
 };

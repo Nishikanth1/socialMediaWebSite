@@ -37,7 +37,7 @@ describe("test user apis", () => {
     await destroyData();
   });
 
-  describe("test get user api", async () => {
+  describe("T1 test get user api", async () => {
     beforeEach("add user to db for test", async () => {
       await createUser({
         email: "test0@gmail.com",
@@ -51,7 +51,7 @@ describe("test user apis", () => {
       await destroyUser();
     });
 
-    it("test get all users ", async () => {
+    it("T1a test get all users ", async () => {
       const response = await app.inject(
         {
           method: "GET",
@@ -59,7 +59,7 @@ describe("test user apis", () => {
         },
       );
       const data = JSON.parse(response.body);
-      console.log(`user data is ${JSON.stringify(data)}`);
+      console.log(`T1a Get users data is ${JSON.stringify(data)}`);
 
       data.should.have.property("count", 1);
       data.rows[0].should.have.property("email", "test0@gmail.com");
@@ -68,7 +68,7 @@ describe("test user apis", () => {
       data.rows[0].should.have.property("gender", "F");
     });
 
-    it("test get single user by id ", async () => {
+    it("T1b test get single user by id ", async () => {
       const allUserResp = await app.inject(
         {
           method: "GET",
@@ -76,16 +76,16 @@ describe("test user apis", () => {
         },
       );
       const allUserData = JSON.parse(allUserResp.body);
-      console.log(`allUserData in get single user data is ${JSON.stringify(allUserData)}`);
+      console.log(`T1b Get users data is  ${JSON.stringify(allUserData)}`);
       const userId = allUserData.rows[0].id;
       const response = await app.inject(
         {
           method: "GET",
-          url: `/user/${userId}`,
+          url: `/users/${userId}`,
         },
       );
       const data = JSON.parse(response.body);
-      console.log(`single user data is ${JSON.stringify(data)}`);
+      console.log(`T1b single user data is ${JSON.stringify(data)}`);
 
       data.should.have.property("id", userId);
       data.should.have.property("email", "test0@gmail.com");
@@ -95,11 +95,11 @@ describe("test user apis", () => {
     });
   });
 
-  describe("test post user api", async () => {
-    it("test add user ", async () => {
+  describe("T2 test post user api", async () => {
+    it("T2a test add user ", async () => {
       const res = await app.inject({
         method: "POST",
-        url: "/user",
+        url: "/users",
         payload: {
           email: "test1@gmail.com",
           username: "test1user",
@@ -108,7 +108,7 @@ describe("test user apis", () => {
         },
       });
       res.should.have.status(201);
-      console.log(`res is ${JSON.stringify(res.payload)}`);
+      console.log(`T2a res is ${JSON.stringify(res.payload)}`);
       const response = await app.inject(
         {
           method: "GET",
@@ -116,13 +116,117 @@ describe("test user apis", () => {
         },
       );
       const data = JSON.parse(response.body);
-      console.log(`user data is ${JSON.stringify(data)}`);
+      console.log(`T2a user data is ${JSON.stringify(data)}`);
 
       data.should.have.property("count", 1);
       data.rows[0].should.have.property("email", "test1@gmail.com");
       data.rows[0].should.have.property("username", "test1user");
       data.rows[0].should.have.property("age", 23);
       data.rows[0].should.have.property("gender", "M");
+    });
+  });
+
+  describe("T3 test update user api", async () => {
+    beforeEach("add user to db for test", async () => {
+      await createUser({
+        email: "test0@gmail.com",
+        username: "test0user",
+        age: 22,
+        gender: "F",
+      });
+    });
+
+    afterEach("clear user data", async () => {
+      await destroyUser();
+    });
+    it("T3a test update user ", async () => {
+      const response = await app.inject(
+        {
+          method: "GET",
+          url: "/users",
+        },
+      );
+      const userData = JSON.parse(response.body);
+      console.log(`T3a update user data is ${JSON.stringify(userData)}`);
+      const userId = userData.rows[0].id;
+
+      const res = await app.inject({
+        method: "PUT",
+        url: `/users/${userId}`,
+        payload: {
+          email: "test1@gmail.com",
+          username: "test1user",
+          age: 23,
+        },
+      });
+      res.should.have.status(200, `res is ${JSON.stringify(res.error)}`);
+      const putResp = res.payload;
+      console.log(`T3a update res is ${JSON.stringify(putResp)}`);
+
+      const updatedUserResp = await app.inject(
+        {
+          method: "GET",
+          url: `/users/${userId}`,
+        },
+      );
+      const updatedUserData = JSON.parse(updatedUserResp.body);
+      console.log(`T3a update resp user data is ${JSON.stringify(updatedUserData)}`);
+
+      updatedUserData.should.have.property("email", "test1@gmail.com");
+      updatedUserData.should.have.property("username", "test1user");
+      updatedUserData.should.have.property("age", 23);
+    });
+  });
+
+  describe("T4 test patch user api", async () => {
+    beforeEach("add user to db for test", async () => {
+      await createUser({
+        email: "test0@gmail.com",
+        username: "test0user",
+        age: 22,
+        gender: "F",
+      });
+    });
+
+    afterEach("clear user data", async () => {
+      await destroyUser();
+    });
+    it("T4a test PATCH user ", async () => {
+      const response = await app.inject(
+        {
+          method: "GET",
+          url: "/users",
+        },
+      );
+      const userData = JSON.parse(response.body);
+      console.log(`patch get user data is ${JSON.stringify(userData)}`);
+      const userId = userData.rows[0].id;
+
+      const res = await app.inject({
+        method: "PATCH",
+        url: `/users/${userId}`,
+        payload: {
+          email: "test1@gmail.com",
+          username: "test1user",
+        },
+      });
+      res.should.have.status(200, `patch resp is ${JSON.stringify(res.error)}`);
+      const putResp = res.payload;
+      console.log(`patch resp is ${JSON.stringify(putResp)}`);
+
+      const updatedUserResp = await app.inject(
+        {
+          method: "GET",
+          url: `/users/${userId}`,
+        },
+      );
+      const updatedUserData = JSON.parse(updatedUserResp.body);
+      console.log(`update resp user data is ${JSON.stringify(updatedUserData)}`);
+
+      updatedUserData.should.have.property("email", "test1@gmail.com");
+      updatedUserData.should.have.property("username", "test1user");
+      updatedUserData.should.have.property("age", 22);
+      updatedUserData.should.have.property("gender", "F");
     });
   });
 });
