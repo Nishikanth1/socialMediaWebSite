@@ -229,4 +229,45 @@ describe("test user apis", () => {
       updatedUserData.should.have.property("gender", "F");
     });
   });
+
+  describe("T5 test delete user api", async () => {
+    beforeEach("add user to db for test", async () => {
+      await createUser({
+        email: "test0@gmail.com",
+        username: "test0user",
+        age: 22,
+        gender: "F",
+      });
+    });
+
+    afterEach("clear user data", async () => {
+      await destroyUser();
+    });
+    it("T1b test get single user by id ", async () => {
+      const allUserResp = await app.inject(
+        {
+          method: "GET",
+          url: "/users",
+        },
+      );
+      const allUserData = JSON.parse(allUserResp.body);
+      const userId = allUserData.rows[0].id;
+      const response = await app.inject(
+        {
+          method: "DELETE",
+          url: `/users/${userId}`,
+        },
+      );
+      response.should.have.status(200, `DELETE resp is ${JSON.stringify(response.error)}`);
+      const data = JSON.parse(response.body);
+      console.log(`delete resp is ${data}`);
+      const userResp = await app.inject(
+        {
+          method: "GET",
+          url: `/users/${userId}`,
+        },
+      );
+      userResp.should.have.status(404, `DELETE resp is ${JSON.stringify(userResp.error)}`);
+    });
+  });
 });

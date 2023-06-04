@@ -7,6 +7,7 @@ async function routes(fastify, options) {
   fastify.patch("/users/:id", async (request, response) => userController.patchUser(request, response, request.log));
   fastify.get("/users", async (request, response) => userController.getAllUsers(request, response, request.log));
   fastify.post("/users", async (request, response) => userController.addUser(request, response, request.log));
+  fastify.delete("/users/:id", async (request, response) => userController.deleteUser(request, response, request.log));
 }
 
 module.exports = routes;
