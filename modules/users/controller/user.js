@@ -6,7 +6,12 @@ async function getUser(request, response, logger) {
   try {
     const userId = request.params.id;
     const data = await User.findByPk(userId);
-    logger.info(`data from get is ${JSON.stringify(data)}`);
+    console.log(`get data is ${JSON.stringify(data)}`);
+    if (!data) {
+      console.log(`DEBUG DEBUG DEBUG ${JSON.stringify(data)}`);
+      response.status(404).send("Resource Not found");
+      return;
+    }
     response.status(200).send(data);
   } catch (error) {
     logger.error(error);
@@ -51,7 +56,6 @@ async function addUser(request, response, logger) {
 async function getAllUsers(request, response, logger) {
   try {
     const data = await User.findAndCountAll();
-    logger.info(`data from get is ${JSON.stringify(data)}`);
     response.status(200).send(data);
   } catch (error) {
     logger.error(error);
@@ -114,10 +118,28 @@ async function patchUser(request, response, logger) {
     });
   }
 }
+
+async function deleteUser(request, response, logger) {
+  const userId = request.params.id;
+  if (!userId) {
+    response.send(400).send(`Invalid user id ${userId}`);
+  }
+  try {
+    const data = await User.destroy({ where: { id: userId } });
+    response.status(200).send({ message: `User ${userId} Deleted successfully` });
+  } catch (error) {
+    logger.error(error);
+    response.status(504).send({
+      message:
+      error.message || `Some error occurred while deleting the user object wiith id ${userId}.`,
+    });
+  }
+}
 module.exports = {
   addUser,
   getAllUsers,
   getUser,
   updateUser,
   patchUser,
+  deleteUser,
 };
