@@ -38,6 +38,7 @@ async function addUser(request, response, logger) {
     gender: request.body.gender,
     fullName: request.body.fullName,
     aboutMe: request.body.aboutMe,
+    password: request.body.password,
   };
 
   try {

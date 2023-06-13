@@ -1,4 +1,5 @@
 const { DataTypes } = require("sequelize");
+const bcrypt = require("bcrypt");
 const { sequelize } = require("../../../dbconnector/connector");
 
 const env = process.env.NODE_ENV;
@@ -15,16 +16,17 @@ const User = sequelize.define("user", {
     allowNull: false,
     unique: true,
   },
-
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   username: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-
   age: {
     type: DataTypes.INTEGER,
   },
-
   gender: {
     type: DataTypes.ENUM(...genderEnums),
 
@@ -36,6 +38,12 @@ const User = sequelize.define("user", {
   aboutMe: {
     type: DataTypes.STRING,
   },
+});
+
+User.beforeCreate(async (user) => {
+  const hashedPassword = await bcrypt.hash(user.password, 10);
+  // eslint-disable-next-line no-param-reassign
+  user.password = hashedPassword;
 });
 
 const forceCleanDb = process.env.CLEAR_DB;

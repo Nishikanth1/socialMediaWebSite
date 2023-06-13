@@ -44,6 +44,7 @@ describe("test user apis", () => {
         username: "test0user",
         age: 22,
         gender: "F",
+        password: "abcd1234",
       });
     });
 
@@ -105,6 +106,7 @@ describe("test user apis", () => {
           username: "test1user",
           age: 23,
           gender: "M",
+          password: "abcd1234",
         },
       });
       res.should.have.status(201);
@@ -133,6 +135,7 @@ describe("test user apis", () => {
         username: "test0user",
         age: 22,
         gender: "F",
+        password: "abcd1234",
       });
     });
 
@@ -185,6 +188,7 @@ describe("test user apis", () => {
         username: "test0user",
         age: 22,
         gender: "F",
+        password: "abcd1234",
       });
     });
 
@@ -237,6 +241,7 @@ describe("test user apis", () => {
         username: "test0user",
         age: 22,
         gender: "F",
+        password: "abcd1234",
       });
     });
 
