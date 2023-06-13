@@ -4,6 +4,7 @@ const { sequelize } = require("../../../dbconnector/connector");
 
 const env = process.env.NODE_ENV;
 const genderEnums = ["M", "F", "O"];
+const roleEnums = ["User", "Admin"];
 
 const User = sequelize.define("user", {
   id: {
@@ -29,14 +30,16 @@ const User = sequelize.define("user", {
   },
   gender: {
     type: DataTypes.ENUM(...genderEnums),
-
   },
-
   fullName: {
     type: DataTypes.STRING,
   },
   aboutMe: {
     type: DataTypes.STRING,
+  },
+  role: {
+    type: DataTypes.ENUM(...genderEnums),
+    defaultValue: "User",
   },
 });
 
