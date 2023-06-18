@@ -38,13 +38,14 @@ const User = sequelize.define("user", {
     type: DataTypes.STRING,
   },
   role: {
-    type: DataTypes.ENUM(...genderEnums),
+    type: DataTypes.ENUM(...roleEnums),
     defaultValue: "User",
   },
 });
 
 User.beforeCreate(async (user) => {
   const hashedPassword = await bcrypt.hash(user.password, 10);
+  console.log(`password ${user.password} hashedPassword ${hashedPassword}`);
   // eslint-disable-next-line no-param-reassign
   user.password = hashedPassword;
 });

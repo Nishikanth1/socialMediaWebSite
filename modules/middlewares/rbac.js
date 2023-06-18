@@ -1,8 +1,8 @@
-const { jwt } = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 const SECRET = process.env.JWT_SECRET;
 
-async function checkRoleIsAllowed(allowedRoles) {
+function checkRoleIsAllowed(allowedRoles) {
   return async (request, response, next) => {
     try {
     // Bearer xyz
@@ -11,6 +11,7 @@ async function checkRoleIsAllowed(allowedRoles) {
       const { email, roles } = decodedToken;
 
       let hasAllowedRole = roles.some((role) => allowedRoles.includes(role));
+      // Admin can do any operation
       hasAllowedRole ||= roles.includes("Admin");
       if (hasAllowedRole) {
         next();
@@ -18,6 +19,7 @@ async function checkRoleIsAllowed(allowedRoles) {
         response.status(403).send("User Unauthorized, Make sure your role is correct");
       }
     } catch (error) {
+      console.error(`Invalid Token ${error}`);
       response.status(401).send("Invalid Token");
     }
   };

@@ -12,6 +12,7 @@ async function getUser(request, response, logger) {
       response.status(404).send("Resource Not found");
       return;
     }
+    delete data.password;
     response.status(200).send(data);
   } catch (error) {
     logger.error(error);
