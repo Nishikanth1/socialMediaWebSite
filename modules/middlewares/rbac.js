@@ -40,7 +40,7 @@ function checkPermissions(allowedRoles) {
 
       if (hasPermissions) {
         request.log.info(`${email} has permissions for api ${api}`);
-        return next();
+        return null;
       }
       return response.status(403).send("User Unauthorized, Make sure your role is correct");
     } catch (error) {
