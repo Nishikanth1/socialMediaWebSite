@@ -33,18 +33,22 @@ async function authenticateUser(email, password) {
   return JSON.parse(res.text);
 }
 
-(async function getToken() {
-  await destroyUser({ email: "test99@gmail.com" });
-  const adminData = {
-    email: "test99@gmail.com",
-    username: "adminUser",
-    age: 22,
-    gender: "F",
-    password: "abcd1234",
-    role: "Admin",
-  };
-  await createUser(adminData);
-  const authRes = await authenticateUser("test99@gmail.com", "abcd1234");
-  session.token = authRes.token;
-  console.log(`Admin User is ${JSON.stringify(adminData)} and token is ${authRes.token}`);
-}());
+const env = process.env.NODE_ENV;
+
+if (env === "DEVELOPMENT") {
+  (async function getToken() {
+    await destroyUser({ email: "test99@gmail.com" });
+    const adminData = {
+      email: "test99@gmail.com",
+      username: "adminUser",
+      age: 22,
+      gender: "F",
+      password: "abcd1234",
+      role: "Admin",
+    };
+    await createUser(adminData);
+    const authRes = await authenticateUser("test99@gmail.com", "abcd1234");
+    session.token = authRes.token;
+    console.log(`Admin User is ${JSON.stringify(adminData)} and token is ${authRes.token}`);
+  }());
+}
