@@ -4,7 +4,7 @@ const SECRET = process.env.JWT_SECRET;
 
 async function checkUserHasPermission(request, actorUserId) {
   const resourceUserId = request.params.id;
-  if (resourceUserId === actorUserId) {
+  if (parseInt(resourceUserId, 10) === parseInt(actorUserId, 10)) {
     return true;
   }
   if (request.method === "GET") {
@@ -28,6 +28,7 @@ function checkPermissions(allowedRoles) {
       const jwtToken = request.headers.authorization.split(" ")[1];
       const decodedToken = jwt.verify(jwtToken, SECRET);
       const { email, roles, id } = decodedToken;
+      console.log(`decodedToken is ${JSON.stringify(decodedToken)}`);
       const actorUserId = id;
       let hasPermissions = false;
       const isRoleAllowed = await checkRoleIsAllowed(roles, allowedRoles);

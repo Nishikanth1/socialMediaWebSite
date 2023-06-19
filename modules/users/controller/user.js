@@ -12,7 +12,7 @@ async function getUser(request, response, logger) {
       return response.status(404).send("Resource Not found");
     }
     delete data.password;
-    response.status(200).send(data);
+    return response.status(200).send(data);
   } catch (error) {
     logger.error(error);
     return response.status(504).send({
@@ -41,8 +41,16 @@ async function addUser(request, response, logger) {
   };
 
   try {
+    const existingUser = await User.findOne({ where: { email: userObject.email } });
+    if (existingUser) {
+      delete existingUser.password;
+      return response.status(403).send(existingUser);
+    }
     const data = await User.create(userObject);
     logger.info(`data from create is ${JSON.stringify(data)}`);
+    if (data) {
+      delete data.password;
+    }
     return response.status(201).send(data);
   } catch (error) {
     logger.error(error);
@@ -69,6 +77,11 @@ async function getAllUsers(request, response, logger) {
 async function updateUser(request, response, logger) {
   try {
     const userId = request.params.id;
+    const where = { id: userId };
+    const existingUser = await User.findOne({ where });
+    if (!existingUser) {
+      return response.status(404).send({ message: `User ${userId} not exists` });
+    }
     const userObject = {
       email: request.body.email,
       username: request.body.username,
@@ -78,7 +91,7 @@ async function updateUser(request, response, logger) {
       aboutMe: request.body.aboutMe,
     };
     logger.info(`udpate user body is ${JSON.stringify(userObject)}`);
-    const data = await User.update(userObject, { where: { id: userId } });
+    const data = await User.update(userObject, { where });
     logger.info(`Update user ${userId} response is ${JSON.stringify(data)}`);
     return response.status(200).send({ isUpdated: true });
   } catch (error) {
@@ -103,6 +116,9 @@ async function patchUser(request, response, logger) {
     };
     logger.info(`patch user body is ${JSON.stringify(userObject)}`);
     const existingUser = await User.findByPk(userId);
+    if (!existingUser) {
+      return response.status(404).send({ message: `User ${userId} not exists` });
+    }
     const updatedUserData = _.merge({}, existingUser, userObject);
     const [updatedRowCount, updatedUsers] = await User.update(updatedUserData, {
       where: { id: userId },
@@ -125,8 +141,13 @@ async function deleteUser(request, response, logger) {
     return response.send(400).send(`Invalid user id ${userId}`);
   }
   try {
-    const data = await User.destroy({ where: { id: userId } });
-    return response.status(200).send({ message: `User ${userId} Deleted successfully` });
+    const where = { id: userId };
+    const existingUser = await User.findOne({ where });
+    if (!existingUser) {
+      return response.status(404).send({ message: `User ${userId} not exists` });
+    }
+    const data = await User.destroy({ where });
+    return response.status(200).send({ message: `User ${userId} Deleted successfully`, data });
   } catch (error) {
     logger.error(error);
     return response.status(504).send({
