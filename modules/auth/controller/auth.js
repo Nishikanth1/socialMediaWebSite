@@ -8,10 +8,11 @@ async function authenticate(email, password) {
   const user = await User.findOne({ where: { email } });
   const storedPasswordHash = user.password;
   if (user) {
+    console.log(`authenticate user is ${JSON.stringify(user)}`);
     const result = await bcrypt.compare(password, storedPasswordHash);
     console.log(`pwd result compare is ${result} jwt is ${JSON.stringify(jwt)}`);
     if (result) {
-      const token = jwt.sign({ email: user.email, roles: [user.role] }, SECRET);
+      const token = jwt.sign({ id: user.id, email: user.email, roles: [user.role] }, SECRET);
       return { auth: true, token };
     }
     return { auth: false };
@@ -24,11 +25,11 @@ async function authenicateUser(request, response, logger) {
   const data = await User.findOne({ where: { email } });
   if (data == null) {
     logger.error("User not found");
-    response.status(404).send("User not found");
+    return response.status(404).send("User not found");
   }
   const result = await authenticate(email, password);
   if (!result.auth) {
-    response.status(401).send("Not Authenticated");
+    return response.status(401).send("Not Authenticated");
   }
   return response.status(200).send(result);
 }

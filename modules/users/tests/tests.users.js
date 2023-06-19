@@ -82,6 +82,9 @@ describe("test user apis", () => {
         {
           method: "GET",
           url: "/users",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       const data = JSON.parse(response.body);
@@ -99,6 +102,9 @@ describe("test user apis", () => {
         {
           method: "GET",
           url: "/users",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       const allUserData = JSON.parse(allUserResp.body);
@@ -137,6 +143,9 @@ describe("test user apis", () => {
           gender: "M",
           password: "abcd1234",
         },
+        headers: {
+          authorization: `Bearer ${session.token}`,
+        },
       });
       res.should.have.status(201);
       console.log(`T2a res is ${JSON.stringify(res.payload)}`);
@@ -144,6 +153,9 @@ describe("test user apis", () => {
         {
           method: "GET",
           url: "/users",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       const data = JSON.parse(response.body);
@@ -176,6 +188,9 @@ describe("test user apis", () => {
         {
           method: "GET",
           url: "/users",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       const userData = JSON.parse(response.body);
@@ -189,6 +204,9 @@ describe("test user apis", () => {
           email: "test1@gmail.com",
           username: "test1user",
           age: 23,
+        },
+        headers: {
+          authorization: `Bearer ${session.token}`,
         },
       });
       res.should.have.status(200, `res is ${JSON.stringify(res.error)}`);
@@ -232,6 +250,9 @@ describe("test user apis", () => {
         {
           method: "GET",
           url: "/users",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       const userData = JSON.parse(response.body);
@@ -244,6 +265,9 @@ describe("test user apis", () => {
         payload: {
           email: "test1@gmail.com",
           username: "test1user",
+        },
+        headers: {
+          authorization: `Bearer ${session.token}`,
         },
       });
       res.should.have.status(200, `patch resp is ${JSON.stringify(res.error)}`);
@@ -288,6 +312,9 @@ describe("test user apis", () => {
         {
           method: "GET",
           url: "/users",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       const allUserData = JSON.parse(allUserResp.body);
@@ -296,6 +323,9 @@ describe("test user apis", () => {
         {
           method: "DELETE",
           url: `/users/${userId}`,
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       response.should.have.status(200, `DELETE resp is ${JSON.stringify(response.error)}`);
