@@ -9,14 +9,13 @@ async function getUser(request, response, logger) {
     console.log(`get data is ${JSON.stringify(data)}`);
     if (!data) {
       console.log(`DEBUG DEBUG DEBUG ${JSON.stringify(data)}`);
-      response.status(404).send("Resource Not found");
-      return;
+      return response.status(404).send("Resource Not found");
     }
     delete data.password;
     response.status(200).send(data);
   } catch (error) {
     logger.error(error);
-    response.status(504).send({
+    return response.status(504).send({
       message:
       error.message || "Some error occurred while reading the user object.",
     });
@@ -25,10 +24,9 @@ async function getUser(request, response, logger) {
 
 async function addUser(request, response, logger) {
   if (!request.body.email || !request.body.username) {
-    response.status(400).send({
+    return response.status(400).send({
       message: "Need both username and email",
     });
-    return;
   }
   logger.info(`request body is ${JSON.stringify(request.body)}`);
   // Create an user
@@ -45,10 +43,10 @@ async function addUser(request, response, logger) {
   try {
     const data = await User.create(userObject);
     logger.info(`data from create is ${JSON.stringify(data)}`);
-    response.status(201).send(data);
+    return response.status(201).send(data);
   } catch (error) {
     logger.error(error);
-    response.status(500).send({
+    return response.status(500).send({
       message:
       error.message || "Some error occurred while creating the user object.",
     });
@@ -58,10 +56,10 @@ async function addUser(request, response, logger) {
 async function getAllUsers(request, response, logger) {
   try {
     const data = await User.findAndCountAll();
-    response.status(200).send(data);
+    return response.status(200).send(data);
   } catch (error) {
     logger.error(error);
-    response.status(504).send({
+    return response.status(504).send({
       message:
       error.message || "Some error occurred while reading the users object.",
     });
@@ -82,10 +80,10 @@ async function updateUser(request, response, logger) {
     logger.info(`udpate user body is ${JSON.stringify(userObject)}`);
     const data = await User.update(userObject, { where: { id: userId } });
     logger.info(`Update user ${userId} response is ${JSON.stringify(data)}`);
-    response.status(200).send({ isUpdated: true });
+    return response.status(200).send({ isUpdated: true });
   } catch (error) {
     logger.error(error);
-    response.status(500).send({
+    return response.status(500).send({
       message:
       error.message || "Some error occurred while updating the user object.",
     });
@@ -111,10 +109,10 @@ async function patchUser(request, response, logger) {
       returning: true,
     });
     logger.info(`Patched user ${userId} response is ${JSON.stringify(updatedUsers)}`);
-    response.status(200).send({ isUpdated: true });
+    return response.status(200).send({ isUpdated: true });
   } catch (error) {
     logger.error(error);
-    response.status(500).send({
+    return response.status(500).send({
       message:
       error.message || "Some error occurred while updating the user object.",
     });
@@ -124,14 +122,14 @@ async function patchUser(request, response, logger) {
 async function deleteUser(request, response, logger) {
   const userId = request.params.id;
   if (!userId) {
-    response.send(400).send(`Invalid user id ${userId}`);
+    return response.send(400).send(`Invalid user id ${userId}`);
   }
   try {
     const data = await User.destroy({ where: { id: userId } });
-    response.status(200).send({ message: `User ${userId} Deleted successfully` });
+    return response.status(200).send({ message: `User ${userId} Deleted successfully` });
   } catch (error) {
     logger.error(error);
-    response.status(504).send({
+    return response.status(504).send({
       message:
       error.message || `Some error occurred while deleting the user object wiith id ${userId}.`,
     });
