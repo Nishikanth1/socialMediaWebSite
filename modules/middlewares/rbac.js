@@ -40,11 +40,13 @@ function checkPermissions(allowedRoles) {
 
       if (hasPermissions) {
         request.log.info(`${email} has permissions for api ${api}`);
-        return null;
+        return;
       }
+      // eslint-disable-next-line consistent-return
       return response.status(403).send("User Unauthorized, Make sure your role is correct");
     } catch (error) {
       request.log.error(`Invalid Token ${error}`);
+      // eslint-disable-next-line consistent-return
       return response.status(401).send("Invalid Token");
     }
   };
