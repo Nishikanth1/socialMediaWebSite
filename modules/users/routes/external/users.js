@@ -8,7 +8,7 @@ async function routes(fastify, options) {
   fastify.put("/users/:id", { preHandler: checkPermissions([roles.User, roles.Admin]) }, async (request, response) => userController.updateUser(request, response, request.log));
   fastify.patch("/users/:id", { preHandler: checkPermissions([roles.User, roles.Admin]) }, async (request, response) => userController.patchUser(request, response, request.log));
   fastify.get("/users", { preHandler: checkPermissions([roles.User, roles.Admin]) }, async (request, response) => userController.getAllUsers(request, response, request.log));
-  fastify.post("/users", { preHandler: checkPermissions([roles.User, roles.Admin]) }, async (request, response) => userController.addUser(request, response, request.log));
+  fastify.post("/users", async (request, response) => userController.addUser(request, response, request.log));
   fastify.delete("/users/:id", { preHandler: checkPermissions([roles.User, roles.Admin]) }, async (request, response) => userController.deleteUser(request, response, request.log));
 }
 
