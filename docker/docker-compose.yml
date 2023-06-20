@@ -14,7 +14,24 @@ services:
       # - db:/var/lib/postgresql/data
       - ./init-scripts/create-test-dbs.sh:/docker-entrypoint-initdb.d/init.sh
       - /docker-entrypoint-initdb.d/init.sh:/init-scripts/create-test-dbs.sh
-
+  neo4j:
+    image: neo4j:community
+    restart: always
+    ports:
+      - 7474:7474
+      - 7687:7687
+    volumes:
+      - /tmp/project1/neo4j/conf:/conf
+      - /tmp/project1/neo4j/data:/data
+      - /tmp/project1/neo4j/import:/import
+      - /tmp/project1/neo4j/logs:/logs
+      - /tmp/project1/neo4j/plugins:/plugins
+    environment: 
+      # Raise memory limits
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms.memory.heap.initial_size=1G
+      - NEO4J_dbms_memory_heap_max__size=1G
+      - NEO4J_AUTH=neo4j/password
 volumes:
   db:
     driver: local
