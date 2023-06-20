@@ -1,6 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const _ = require("lodash");
+const axios = require("axios");
 const { User } = require("../models/user");
+
+const friendsServiceUrl = "http://127.0.0.1:30000";
 
 async function getUser(request, response, logger) {
   try {
@@ -51,6 +54,14 @@ async function addUser(request, response, logger) {
     if (data) {
       delete data.password;
     }
+    const friendsResp = await axios.post(
+      `${friendsServiceUrl}/friends/user`,
+      {
+        id: data.id,
+        email: data.email,
+      },
+    );
+    console.log(`friendsResp is ${JSON.stringify(friendsResp.data)}`);
     return response.status(201).send(data);
   } catch (error) {
     logger.error(error);
