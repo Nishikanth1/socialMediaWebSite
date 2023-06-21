@@ -1,4 +1,4 @@
-const { runNeo4jQuery } = require("../modules/friends/neo4jHelpers");
+const { runNeo4jQuery } = require("../modules/friends/service/neo4jHelpers");
 
 const personName = "Alice";
 
