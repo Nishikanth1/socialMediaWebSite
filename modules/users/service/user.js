@@ -60,7 +60,7 @@ async function addUser(request, response, logger) {
         email: data.email,
       },
     );
-    logger.info(`friendsResp is ${JSON.stringify(friendsResp.data)}`);
+    console.log(`friendsResp is ${JSON.stringify(friendsResp.data)}`);
     return response.status(201).send(data);
   } catch (error) {
     logger.error(error);
