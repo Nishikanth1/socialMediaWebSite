@@ -1,7 +1,9 @@
 /* eslint-disable no-undef */
 const chai = require("chai");
 const chaiHttp = require("chai-http");
+const nock = require("nock");
 const { buildapp } = require("../../../app");
+const { friendsServiceUrl } = require("../../helpers/services");
 
 const should = chai.should();
 const { User, syncModels } = require("../models/user");
@@ -133,6 +135,11 @@ describe("test user apis", () => {
 
   describe("T2 test post user api", async () => {
     it("T2a test add user ", async () => {
+      nock(`${friendsServiceUrl}`)
+        .post("/friends/user")
+        .reply(200, {
+          message: "Successfully create user 5 test1@gmail.com",
+        });
       const res = await app.inject({
         method: "POST",
         url: "/users",
@@ -319,6 +326,11 @@ describe("test user apis", () => {
       );
       const allUserData = JSON.parse(allUserResp.body);
       const userId = allUserData.rows[0].id;
+      nock(`${friendsServiceUrl}`)
+        .delete(`/friends/user/${userId}`)
+        .reply(200, {
+          message: "Successfully delete user 5",
+        });
       const response = await app.inject(
         {
           method: "DELETE",

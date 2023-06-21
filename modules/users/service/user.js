@@ -2,8 +2,7 @@
 const _ = require("lodash");
 const axios = require("axios");
 const { User } = require("../models/user");
-
-const friendsServiceUrl = "http://127.0.0.1:30000";
+const { friendsServiceUrl } = require("../../helpers/services");
 
 async function getUser(request, response, logger) {
   try {
@@ -158,6 +157,10 @@ async function deleteUser(request, response, logger) {
       return response.status(404).send({ message: `User ${userId} not exists` });
     }
     const data = await User.destroy({ where });
+    const friendsResp = await axios.delete(
+      `${friendsServiceUrl}/friends/user/${userId}`,
+    );
+    logger.info(`friendsResp is ${JSON.stringify(friendsResp.data)}`);
     return response.status(200).send({ message: `User ${userId} Deleted successfully`, data });
   } catch (error) {
     logger.error(error);
@@ -167,6 +170,7 @@ async function deleteUser(request, response, logger) {
     });
   }
 }
+
 module.exports = {
   addUser,
   getAllUsers,
