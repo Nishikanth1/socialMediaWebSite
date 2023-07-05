@@ -148,7 +148,7 @@ async function patchUser(request, response, logger) {
 async function deleteUser(request, response, logger) {
   const userId = request.params.id;
   if (!userId) {
-    return response.send(400).send(`Invalid user id ${userId}`);
+    return response.status(400).send(`Invalid user id ${userId}`);
   }
   try {
     const where = { id: userId };
