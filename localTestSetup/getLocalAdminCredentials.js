@@ -11,7 +11,7 @@ const session = {};
 async function destroyUser(where) {
   await User.destroy({
     where: { ...where },
-    truncate: true,
+    // truncate: true,
   });
 }
 
@@ -34,21 +34,30 @@ async function authenticateUser(email, password) {
 }
 
 const env = process.env.NODE_ENV;
+async function addAdminUser() {
+  await syncModels();
+  await destroyUser({ email: "adminUser@gmail.com" });
+  const adminData = {
+    email: "adminUser@gmail.com",
+    username: "adminUser",
+    age: 22,
+    gender: "F",
+    password: "abcd1234",
+    role: "Admin",
+  };
+  await createUser(adminData);
+  const authRes = await authenticateUser("adminUser@gmail.com", "abcd1234");
+  session.token = authRes.token;
+  console.log(`Admin User is ${JSON.stringify(adminData)} and token is ${authRes.token}`);
+  return { token: authRes.token, adminData };
+}
 
 if (env === "DEVELOPMENT") {
-  (async function getToken() {
-    await destroyUser({ email: "test99@gmail.com" });
-    const adminData = {
-      email: "test99@gmail.com",
-      username: "adminUser",
-      age: 22,
-      gender: "F",
-      password: "abcd1234",
-      role: "Admin",
-    };
-    await createUser(adminData);
-    const authRes = await authenticateUser("test99@gmail.com", "abcd1234");
-    session.token = authRes.token;
-    console.log(`Admin User is ${JSON.stringify(adminData)} and token is ${authRes.token}`);
-  }());
+  // if run as standalone script
+  if (require.main === module) {
+    (addAdminUser());
+  }
 }
+module.exports = {
+  addAdminUser,
+};
