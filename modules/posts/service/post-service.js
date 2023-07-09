@@ -22,7 +22,7 @@ async function getPost(request, response, logger) {
 async function getUserPosts(request, response, logger) {
   try {
     const { userId } = request.params;
-    const { limit, offset } = getLimitOffset(request.params);
+    const { limit, offset } = getLimitOffset(request);
 
     const where = { userId };
     const data = await Post.findAndCountAll({ where, limit, offset });
