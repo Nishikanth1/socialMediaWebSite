@@ -82,9 +82,66 @@ async function deletePost(request, response, logger) {
   }
 }
 
+async function patchPost(request, response, logger) {
+  try {
+    const postId = request.params.id;
+    const postObject = {
+      title: request.body.title,
+      content: request.body.content,
+      userId: request.body.userId,
+    };
+    logger.info(`patch post body is ${JSON.stringify(postObject)}`);
+    const existingPost = await Post.findByPk(postId);
+    if (!existingPost) {
+      return response.status(404).send({ message: `User ${postId} not exists` });
+    }
+    const updatedUserData = _.merge({}, existingPost, postObject);
+    const [updatedRowCount, updatedPosts] = await Post.update(updatedUserData, {
+      where: { id: postId },
+      returning: true,
+    });
+
+    logger.info(`Patched post ${postId} response is ${JSON.stringify(updatedPosts)}`);
+    return response.status(200).send({ isUpdated: true, data: updatedPosts });
+  } catch (error) {
+    logger.error(error);
+    return response.status(500).send({
+      message:
+      error.message || "Some error occurred while updating the post object.",
+    });
+  }
+}
+
+async function updatePost(request, response, logger) {
+  try {
+    const PostId = request.params.id;
+    const where = { id: PostId };
+    const existingPost = await Post.findOne({ where });
+    if (!existingPost) {
+      return response.status(404).send({ message: `Post ${PostId} not exists` });
+    }
+    const PostObject = {
+      title: request.body.title,
+      content: request.body.content,
+      userId: request.body.userId,
+    };
+    logger.info(`udpate Post body is ${JSON.stringify(PostObject)}`);
+    const data = await Post.update(PostObject, { where });
+    logger.info(`Update Post ${PostId} response is ${JSON.stringify(data)}`);
+    return response.status(200).send({ isUpdated: true });
+  } catch (error) {
+    logger.error(error);
+    return response.status(500).send({
+      message:
+      error.message || "Some error occurred while updating the Post object.",
+    });
+  }
+}
 module.exports = {
   getPost,
   createPost,
   deletePost,
   getUserPosts,
+  patchPost,
+  updatePost,
 };

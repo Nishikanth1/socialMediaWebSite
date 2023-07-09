@@ -4,6 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "NODE_ENV=DEVELOPMENT mocha  'modules/**/tests/*.js' --timeout 400000",
+    "testPosts": "NODE_ENV=DEVELOPMENT mocha  'modules/posts/tests/*.js' --timeout 400000",
     "e2e": "mocha  'test/e2e.js' --timeout 400000"
   },
   "keywords": [],

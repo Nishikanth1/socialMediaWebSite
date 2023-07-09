@@ -14,6 +14,48 @@ const session = {};
 before(async () => {
   app = await buildapp();
   await syncModels();
+  it("add single user", async () => {
+    const testUserData = {
+      email: "testuser@gmail.com",
+      username: "testuser",
+      password: "testpwd",
+      age: 21,
+      gender: "M",
+      fullName: "testuser1 prasad",
+      aboutMe: "Hey I am a test user",
+    };
+    const response = await app.inject({
+      method: "POST",
+      url: "/users",
+      payload: {
+        ...testUserData,
+      },
+    });
+    const data = JSON.parse(response.body);
+    session.userId = data.id;
+    console.log(`data is ${JSON.stringify(data)}`);
+    data.should.have.property("id");
+    data.should.have.property("email", testUserData.email);
+    data.should.have.property("username", testUserData.username);
+    data.should.have.property("age", testUserData.age);
+    data.should.have.property("gender", testUserData.gender);
+    data.should.have.property("fullName", testUserData.fullName);
+    data.should.have.property("aboutMe", testUserData.aboutMe);
+    const authResponse = await app.inject({
+      method: "POST",
+      url: "/authenticate",
+      payload: {
+        email: testUserData.email,
+        password: testUserData.password,
+      },
+    });
+    const authData = JSON.parse(authResponse.body);
+
+    console.log(`auth response is ${JSON.stringify(authData)}`);
+    authData.should.have.property("auth", true);
+    authData.should.have.property("token");
+    session.token = authData.token;
+  });
 });
 
 after(async () => {
@@ -46,7 +88,10 @@ describe("test site post apis", () => {
         payload: {
           title: "First Title",
           content: "Test Content1, Test Content2, Test Content3",
-          userId: 23,
+          userId: session.userId,
+        },
+        headers: {
+          authorization: `Bearer ${session.token}`,
         },
       });
       res.should.have.status(201);
@@ -56,6 +101,9 @@ describe("test site post apis", () => {
         {
           method: "GET",
           url: `/posts/${postId}`,
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       response.should.have.status(200);
@@ -71,6 +119,9 @@ describe("test site post apis", () => {
         {
           method: "delete",
           url: "/posts/12323",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       response.should.have.status(404);
@@ -81,6 +132,9 @@ describe("test site post apis", () => {
         {
           method: "delete",
           url: "/posts/",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       response.should.have.status(400);
@@ -93,7 +147,10 @@ describe("test site post apis", () => {
         payload: {
           title: "Second Title",
           content: "Test Content1, Test Content2, Test Content3",
-          userId: 25,
+          userId: session.userId,
+        },
+        headers: {
+          authorization: `Bearer ${session.token}`,
         },
       });
       const postId = JSON.parse(res.body).id;
@@ -102,6 +159,9 @@ describe("test site post apis", () => {
         {
           method: "delete",
           url: `/posts/${postId}`,
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       response.should.have.status(200);
@@ -109,6 +169,9 @@ describe("test site post apis", () => {
         {
           method: "GET",
           url: `/posts/${postId}`,
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       getRes1.should.have.status(404);
@@ -121,6 +184,9 @@ describe("test site post apis", () => {
         {
           method: "GET",
           url: "/users/posts/12323",
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       response.should.have.status(200);
@@ -137,7 +203,10 @@ describe("test site post apis", () => {
         payload: {
           title: "Third Title",
           content: "Test Content1, Test Content2, Test Content3",
-          userId: 25,
+          userId: session.userId,
+        },
+        headers: {
+          authorization: `Bearer ${session.token}`,
         },
       });
       const postIdList = [];
@@ -149,7 +218,10 @@ describe("test site post apis", () => {
         payload: {
           title: "Fourth Title",
           content: "Test Content1, Test Content2, Test Content3",
-          userId: 25,
+          userId: session.userId,
+        },
+        headers: {
+          authorization: `Bearer ${session.token}`,
         },
       });
       postIdList.push(JSON.parse(res2.body).id);
@@ -160,14 +232,20 @@ describe("test site post apis", () => {
         payload: {
           title: "Fifth Title",
           content: "Test Content1, Test Content2, Test Content3",
-          userId: 30,
+          userId: 30, // otheruserId
+        },
+        headers: {
+          authorization: `Bearer ${session.token}`,
         },
       });
 
       const response = await app.inject(
         {
           method: "GET",
-          url: "/users/posts/25",
+          url: `/users/posts/${session.userId}`,
+          headers: {
+            authorization: `Bearer ${session.token}`,
+          },
         },
       );
       response.should.have.status(200);
