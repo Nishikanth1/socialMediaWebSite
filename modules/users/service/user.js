@@ -135,7 +135,7 @@ async function patchUser(request, response, logger) {
       returning: true,
     });
     logger.info(`Patched user ${userId} response is ${JSON.stringify(updatedUsers)}`);
-    return response.status(200).send({ isUpdated: true });
+    return response.status(200).send({ isUpdated: true, data: updatedUserData });
   } catch (error) {
     logger.error(error);
     return response.status(500).send({
