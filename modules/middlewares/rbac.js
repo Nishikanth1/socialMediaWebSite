@@ -90,7 +90,7 @@ function checkPermissions(allowedRoles) {
         return;
       }
       // eslint-disable-next-line consistent-return
-      return response.status(403).send("User Unauthorized, Make sure your role is correct");
+      return response.status(403).send("User Unauthorized, Make sure your role/user is correct");
     } catch (error) {
       request.log.error(`Invalid Token ${error}`);
       // eslint-disable-next-line consistent-return
