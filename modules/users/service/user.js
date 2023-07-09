@@ -3,6 +3,7 @@ const _ = require("lodash");
 const axios = require("axios");
 const { User } = require("../models/user");
 const { friendsServiceUrl } = require("../../helpers/services");
+const { getLimitOffset } = require("../../helpers/utils");
 
 async function getUser(request, response, logger) {
   try {
@@ -73,7 +74,10 @@ async function addUser(request, response, logger) {
 
 async function getAllUsers(request, response, logger) {
   try {
-    const data = await User.findAndCountAll();
+    const { limit, offset } = getLimitOffset(request);
+    const data = await User.findAndCountAll({
+      limit, offset,
+    });
     return response.status(200).send(data);
   } catch (error) {
     logger.error(error);
